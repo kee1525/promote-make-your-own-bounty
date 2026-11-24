@@ -19,22 +19,36 @@ import { join } from "node:path";
 const botDir = process.env.MAKEFUN_BOT_DIR ?? "/bot";
 const outputDir = process.env.MAKEFUN_OUTPUT_DIR ?? "/output";
 
-const source = readFileSync(join(botDir, "POST.json"), "utf8");
-
-let named: unknown;
-try {
-  named = JSON.parse(source);
-} catch {
-  console.error("POST.json is not valid JSON");
-  process.exit(1);
-}
-
-const url = (named as { url?: unknown }).url;
+// An X post address: the host, the account's handle, and the numeric id.
 const statusAddress = /^https:\/\/(x\.com|twitter\.com)\/[^/]+\/status\/\d+$/;
-if (typeof url !== "string" || !statusAddress.test(url)) {
-  console.error(`POST.json does not name an X post: ${source}`);
-  process.exit(1);
+
+// Read POST.json from the bot directory and return its exact contents,
+// once the address inside it has been checked. Any problem is fatal:
+// a grader that cannot be handed the file has nothing to grade.
+function readNamedPost(): string {
+  let source: string;
+  try {
+    source = readFileSync(join(botDir, "POST.json"), "utf8");
+  } catch {
+    console.error(`POST.json could not be read from ${botDir}`);
+    process.exit(1);
+  }
+
+  let named: unknown;
+  try {
+    named = JSON.parse(source);
+  } catch {
+    console.error("POST.json is not valid JSON");
+    process.exit(1);
+  }
+
+  const url = (named as { url?: unknown }).url;
+  if (typeof url !== "string" || !statusAddress.test(url)) {
+    console.error(`POST.json does not name an X post: ${source}`);
+    process.exit(1);
+  }
+  return source;
 }
 
 mkdirSync(outputDir, { recursive: true });
-writeFileSync(join(outputDir, "POST.json"), source);
+writeFileSync(join(outputDir, "POST.json"), readNamedPost());

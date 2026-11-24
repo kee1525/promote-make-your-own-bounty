@@ -24,3 +24,12 @@ program; the post itself is the entry.
 Run it:
 
     mkdir -p out && MAKEFUN_BOT_DIR=. MAKEFUN_OUTPUT_DIR=out node main.ts
+
+## Verification
+
+Before this entry was handed in, the post was read back through
+FxTwitter, the same public read the house uses: it quotes
+@makefunai's post 2124915864336236646, carries one photo of its own,
+tags @makefunai, and its text prints the play code
+makefun-capsule-valve-angler. The account and the post stay public
+until the results are out.
